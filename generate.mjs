@@ -14,7 +14,7 @@ import crypto from 'node:crypto';
 loadEnv(path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '.env'));
 
 const cfg = {
-  shop: process.env.SHOPIFY_SHOP,                       // npr. mojshop.myshopify.com
+  shop: normalizeShop(process.env.SHOPIFY_SHOP),        // npr. mojshop.myshopify.com
   token: process.env.SHOPIFY_ACCESS_TOKEN,              // stari custom app (shpat_...)
   clientId: process.env.SHOPIFY_CLIENT_ID,              // ili Dev Dashboard app (client credentials)
   clientSecret: process.env.SHOPIFY_CLIENT_SECRET,
@@ -59,9 +59,21 @@ const UNIT_FACTORS = { // prema baznoj jedinici (g, ml, m, m2, m3)
 const UNIT_LABELS = { MG: 'mg', G: 'g', KG: 'kg', ML: 'ml', CL: 'cl', L: 'l', M3: 'm3', MM: 'mm', CM: 'cm', M: 'm', M2: 'm2', ITEM: 'kom' };
 
 main().catch(err => {
-  console.error('GREŠKA:', err.message);
+  console.error('GREŠKA:', err.message, err.cause ? `(${err.cause.code || err.cause.message})` : '');
+  if (err.message === 'fetch failed') console.error(`Provjeri SHOPIFY_SHOP – skripta se spaja na: ${cfg.shop}`);
   process.exit(1);
 });
+
+// Prihvaća "mojshop", "mojshop.myshopify.com", "https://mojshop.myshopify.com/" i
+// "https://admin.shopify.com/store/mojshop/..." – uvijek vraća "mojshop.myshopify.com"
+function normalizeShop(value) {
+  if (!value) return value;
+  let s = value.trim().toLowerCase().replace(/^https?:\/\//, '');
+  const admin = s.match(/^admin\.shopify\.com\/store\/([^/?#]+)/);
+  if (admin) return `${admin[1]}.myshopify.com`;
+  s = s.split(/[/?#]/)[0];
+  return s.includes('.') ? s : `${s}.myshopify.com`;
+}
 
 async function main() {
   const now = new Date();
