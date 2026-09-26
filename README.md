@@ -1,6 +1,6 @@
 # Shopify → javni cjenik (CSV) + arhiva
 
-GitHub svaki sat pokrene `generate.mjs`, koji pročita Shopify i objavi na GitHub Pages:
+GitHub svaki dan prije 8:00 pokrene `generate.mjs`, koji pročita Shopify i objavi na GitHub Pages:
 
 | Adresa | Sadržaj |
 |---|---|
@@ -78,7 +78,7 @@ Shopify i glavna domena shopa ostaju netaknuti.
 
 ## Kako radi arhiva
 
-- `cjenik.csv` se osvježava svaki sat.
+- `cjenik.csv` se osvježava svaki dan prije 8:00 (oko 6:17 ljeti, 5:17 zimi).
 - Kad se sadržaj razlikuje od zadnje arhivirane verzije, sprema se nova datoteka u `arhiva/`
   s datumom i vremenom. Iz arhive se tako vidi točno kad se promijenila cijena ili dostupnost.
 - Datoteke starije od 35 dana brišu se automatski.
@@ -87,7 +87,7 @@ Shopify i glavna domena shopa ostaju netaknuti.
 ## Napomene
 
 - GitHub može gasiti zakazane workflowe u repozitoriju bez aktivnosti 60 dana. Ovdje se
-  objavljuje svaki sat, pa se to ne bi trebalo dogoditi. Ipak, jednom mjesečno baci pogled na *Actions*.
+  objavljuje svaki dan, pa se to ne bi trebalo dogoditi. Ipak, jednom mjesečno baci pogled na *Actions*.
 - Kolone se mijenjaju u nizu `COLUMNS` na vrhu `generate.mjs`.
 
 ## Lokalni test bez Shopifyja

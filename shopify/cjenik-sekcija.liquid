@@ -1,13 +1,13 @@
 {%- comment -%}
   Stranica "Cjenik proizvoda" – zalijepi u Custom Liquid sekciju predloška page.cjenik.
-  Podatke (zadnje ažuriranje, CSV, arhivu) čita s GitHub Pagesa, gdje ih generator objavljuje svaki sat.
+  Podatke (zadnje ažuriranje, CSV, arhivu) čita s GitHub Pagesa, gdje ih generator objavljuje svaki dan prije 8:00.
 {%- endcomment -%}
 {%- assign cjenik_url = 'https://grga0301.github.io/cjenik' -%}
 
 <div class="page-width cjenik-page" style="max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem;">
   <p>
     Aktualni cjenik svih artikala dostupan je za preuzimanje u CSV formatu
-    (UTF-8, razdjelnik „;“). Cjenik se automatski ažurira svaki sat.
+    (UTF-8, razdjelnik „;“). Cjenik se automatski ažurira svaki dan do 8:00.
   </p>
 
   <p><strong>Posljednje ažuriranje:</strong> <span id="cjenik-updated">učitavanje…</span><br>

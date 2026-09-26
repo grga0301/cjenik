@@ -1,4 +1,4 @@
 # crontab -e  (korisnik koji smije pisati u /var/www/cjenik)
 CRON_TZ=Europe/Zagreb
-# Svaki sat od 6 do 22 h, svaki dan – pokriva obvezu "radnim danom do 8:00" i drži cjenik gotovo u realnom vremenu
-5 6-22 * * * cd /opt/shopify-cjenik && /usr/bin/node generate.mjs >> /var/log/shopify-cjenik.log 2>&1
+# Svaki dan u 6:30
+30 6 * * * cd /opt/shopify-cjenik && /usr/bin/node generate.mjs >> /var/log/shopify-cjenik.log 2>&1

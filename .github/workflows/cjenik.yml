@@ -2,7 +2,7 @@ name: Cjenik
 
 on:
   schedule:
-    - cron: '5 * * * *'   # svaki sat (UTC); GitHub zna kasniti nekoliko minuta
+    - cron: '17 4 * * *'  # svaki dan 04:17 UTC = 06:17 ljeti / 05:17 zimi po hrvatskom vremenu (rezerva za kašnjenje GitHuba)
   workflow_dispatch:       # ručno pokretanje: Actions → Cjenik → Run workflow
 
 permissions:
