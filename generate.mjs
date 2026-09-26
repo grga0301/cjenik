@@ -26,6 +26,9 @@ const cfg = {
   anchor: process.env.ANCHOR_METAFIELD || 'variant:custom.sidrena_cijena',
   // Ako je compare-at cijena veća od cijene, artikl se tretira kao snižen (poseban oblik prodaje)
   saleFromCompareAt: (process.env.SALE_FROM_COMPARE_AT || 'true') === 'true',
+  // Vendori koji su stvarne marke proizvoda (odvojeni zarezom); ostalima marka ostaje prazna.
+  // Prazno = svaki vendor se upisuje kao marka.
+  brandVendors: (process.env.BRAND_VENDORS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
   defaultUnit: process.env.DEFAULT_UNIT || 'kom',
   delimiter: process.env.CSV_DELIMITER || ';',
   decimal: process.env.CSV_DECIMAL || ',',
@@ -191,7 +194,7 @@ function toRow(v, history, today) {
   return {
     title,
     sku: v.sku || v.id.split('/').pop(), // bez SKU-a: stalni Shopify ID varijante
-    vendor: v.product.vendor || '',
+    vendor: brand(v.product.vendor),
     netQty: upm?.quantityValue ? `${fmtNum(upm.quantityValue)} ${UNIT_LABELS[upm.quantityUnit] || upm.quantityUnit.toLowerCase()}` : '',
     unit: upm?.referenceUnit ? `${upm.referenceValue > 1 ? upm.referenceValue + ' ' : ''}${UNIT_LABELS[upm.referenceUnit] || upm.referenceUnit.toLowerCase()}` : cfg.defaultUnit,
     regularPrice: onSale ? compareAt : price,
@@ -203,6 +206,12 @@ function toRow(v, history, today) {
     barcode: v.barcode || '',
     available: !!v.availableForSale,
   };
+}
+
+function brand(vendor) {
+  if (!vendor) return '';
+  if (!cfg.brandVendors.length) return vendor;
+  return cfg.brandVendors.includes(vendor.trim().toLowerCase()) ? vendor : '';
 }
 
 function unitPrice(price, upm) {
