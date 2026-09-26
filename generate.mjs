@@ -26,9 +26,10 @@ const cfg = {
   anchor: process.env.ANCHOR_METAFIELD || 'variant:custom.sidrena_cijena',
   // Ako je compare-at cijena veća od cijene, artikl se tretira kao snižen (poseban oblik prodaje)
   saleFromCompareAt: (process.env.SALE_FROM_COMPARE_AT || 'true') === 'true',
-  // Vendori koji su stvarne marke proizvoda (odvojeni zarezom); ostalima marka ostaje prazna.
-  // Prazno = svaki vendor se upisuje kao marka.
-  brandVendors: (process.env.BRAND_VENDORS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
+  // Preslikavanje vendor → marka, npr. "Lotus Centar=New Science,New Science=New Science".
+  // Vendori kojih nema na popisu dobivaju praznu marku. Prazno = vendor se upisuje kao marka.
+  brandMap: Object.fromEntries((process.env.BRAND_MAP || '').split(',').map(p => p.split('='))
+    .filter(p => p.length === 2 && p[0].trim()).map(([v, b]) => [v.trim().toLowerCase(), b.trim()])),
   defaultUnit: process.env.DEFAULT_UNIT || 'kom',
   delimiter: process.env.CSV_DELIMITER || ';',
   decimal: process.env.CSV_DECIMAL || ',',
@@ -210,8 +211,8 @@ function toRow(v, history, today) {
 
 function brand(vendor) {
   if (!vendor) return '';
-  if (!cfg.brandVendors.length) return vendor;
-  return cfg.brandVendors.includes(vendor.trim().toLowerCase()) ? vendor : '';
+  if (!Object.keys(cfg.brandMap).length) return vendor;
+  return cfg.brandMap[vendor.trim().toLowerCase()] || '';
 }
 
 function unitPrice(price, upm) {
