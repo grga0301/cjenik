@@ -38,14 +38,14 @@ jobs:
           SHOPIFY_CLIENT_ID: ${{ secrets.SHOPIFY_CLIENT_ID }}
           SHOPIFY_CLIENT_SECRET: ${{ secrets.SHOPIFY_CLIENT_SECRET }}
           SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
-          ANCHOR_METAFIELD: variant:custom.sidrena_cijena
-          BRAND_MAP: Lotus Centar=New Science,New Science=New Science   # vendor=marka; ostali vendori nemaju marku
+          ANCHOR_METAFIELD: ${{ vars.ANCHOR_METAFIELD || 'variant:custom.sidrena_cijena' }}
+          BRAND_MAP: ${{ vars.BRAND_MAP }}   # vendor=marka, npr. "Lotus Centar=New Science"; prazno = vendor je marka
           SHOP_NAME: ${{ vars.SHOP_NAME }}
           PUBLIC_URL: ${{ vars.PUBLIC_URL }}
           OUTPUT_DIR: public
         run: node generate.mjs
 
-      # Grana gh-pages uvijek ima samo jedan commit, pa repozitorij ne raste iz sata u sat
+      # Grana gh-pages uvijek ima samo jedan commit, pa repozitorij ne raste iz dana u dan
       - name: Objavi
         env:
           PAGES_DOMAIN: ${{ vars.PAGES_DOMAIN }}
