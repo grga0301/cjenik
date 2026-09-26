@@ -46,7 +46,6 @@ const COLUMNS = [
   ['Najniža cijena u posljednjih 30 dana', r => money(r.lowest30)],
   ['Sidrena cijena', r => money(r.anchorPrice)],
   ['Barkod', r => r.barcode],
-  ['Kategorija proizvoda', r => r.category],
   ['Dostupnost', r => (r.available ? 'DA' : 'NE')],
   ['Valuta', () => 'EUR'],
 ];
@@ -110,6 +109,7 @@ async function main() {
   }
   pruneArchive(archiveDir, now);
   writeAtomic(path.join(cfg.outputDir, 'index.html'), renderIndex(now, rows.length, archiveDir));
+  writeAtomic(path.join(cfg.outputDir, 'cjenik.json'), JSON.stringify(renderMeta(now, rows.length, archiveDir)));
 
   console.log(`${new Date().toISOString()} ok: ${rows.length} artikala, ${changed ? 'nova verzija arhivirana' : 'bez promjena'}`);
 }
@@ -137,8 +137,7 @@ query ($cursor: String, $ns: String!, $key: String!) {
       unitPriceMeasurement { quantityValue quantityUnit referenceValue referenceUnit }
       anchor: metafield(namespace: $ns, key: $key) { value }
       product {
-        id title vendor productType status onlineStoreUrl isGiftCard
-        category { name }
+        id title vendor status onlineStoreUrl isGiftCard
         anchor: metafield(namespace: $ns, key: $key) { value }
       }
     }
@@ -202,7 +201,6 @@ function toRow(v, history, today) {
     lowest30,
     anchorPrice: cfg.anchor === 'none' ? null : parseMetafieldMoney(v.anchor?.value ?? v.product.anchor?.value),
     barcode: v.barcode || '',
-    category: v.product.productType || v.product.category?.name || '',
     available: !!v.availableForSale,
   };
 }
@@ -254,14 +252,29 @@ function toCsv(rows) {
   return '﻿' + lines.join('\r\n') + '\r\n'; // BOM da Excel ispravno prikaže č/ć/š/ž
 }
 
+function listArchive(archiveDir) {
+  return fs.readdirSync(archiveDir).filter(f => f.endsWith('.csv')).sort().reverse().map(f => {
+    const m = f.match(/^cjenik_(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})\.csv$/);
+    return { file: `arhiva/${f}`, label: m ? `${m[3]}.${m[2]}.${m[1]}. ${m[4]}:${m[5]}` : f };
+  });
+}
+
+// Za Shopify stranicu (shopify/cjenik-sekcija.liquid), koja ovo čita JavaScriptom
+function renderMeta(now, count, archiveDir) {
+  return {
+    updated: `${zagrebDate(now).split('-').reverse().join('.')}. ${zagrebTime(now)}`,
+    count,
+    csv: 'cjenik.csv',
+    archiveDays: cfg.archiveDays,
+    archive: listArchive(archiveDir),
+  };
+}
+
 function renderIndex(now, count, archiveDir) {
   const base = cfg.publicUrl || '.';
-  const files = fs.readdirSync(archiveDir).filter(f => f.endsWith('.csv')).sort().reverse();
-  const items = files.map(f => {
-    const m = f.match(/^cjenik_(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})\.csv$/);
-    const label = m ? `${m[3]}.${m[2]}.${m[1]}. ${m[4]}:${m[5]}` : f;
-    return `<li><a href="${base}/arhiva/${f}" download>${label}</a></li>`;
-  }).join('\n      ');
+  const items = listArchive(archiveDir)
+    .map(a => `<li><a href="${base}/${a.file}" download>${a.label}</a></li>`)
+    .join('\n      ');
   return `<!doctype html>
 <html lang="hr">
 <head>

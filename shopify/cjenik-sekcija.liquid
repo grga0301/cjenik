@@ -1,0 +1,56 @@
+{%- comment -%}
+  Stranica "Cjenik proizvoda" – zalijepi u Custom Liquid sekciju predloška page.cjenik.
+  Podatke (zadnje ažuriranje, CSV, arhivu) čita s GitHub Pagesa, gdje ih generator objavljuje svaki sat.
+{%- endcomment -%}
+{%- assign cjenik_url = 'https://grga0301.github.io/cjenik' -%}
+
+<div class="page-width cjenik-page" style="max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem;">
+  <p>
+    Aktualni cjenik svih artikala dostupan je za preuzimanje u CSV formatu
+    (UTF-8, razdjelnik „;“). Cjenik se automatski ažurira svaki sat.
+  </p>
+
+  <p><strong>Posljednje ažuriranje:</strong> <span id="cjenik-updated">učitavanje…</span><br>
+     <small>Broj artikala: <span id="cjenik-count">–</span></small></p>
+
+  <p>
+    <a class="button" href="{{ cjenik_url }}/cjenik.csv" download>Preuzmi aktualni cjenik (CSV)</a>
+  </p>
+  <p><small>Stalna adresa za automatsko preuzimanje:
+    <a href="{{ cjenik_url }}/cjenik.csv">{{ cjenik_url }}/cjenik.csv</a></small></p>
+
+  <h2 style="margin-top: 2.5rem;">Arhiva cjenika</h2>
+  <p><small>Prethodne verzije cjenika, dostupne najmanje 30 dana. Nova verzija nastaje pri svakoj promjeni cijene ili dostupnosti.</small></p>
+  <ul id="cjenik-arhiva" style="padding-left: 1.2rem; line-height: 1.8;">
+    <li>učitavanje…</li>
+  </ul>
+</div>
+
+<script>
+  (function () {
+    var base = '{{ cjenik_url }}';
+    fetch(base + '/cjenik.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        document.getElementById('cjenik-updated').textContent = d.updated;
+        document.getElementById('cjenik-count').textContent = d.count;
+        var ul = document.getElementById('cjenik-arhiva');
+        ul.innerHTML = '';
+        d.archive.forEach(function (a) {
+          var li = document.createElement('li');
+          var link = document.createElement('a');
+          link.href = base + '/' + a.file;
+          link.textContent = a.label;
+          link.setAttribute('download', '');
+          li.appendChild(link);
+          ul.appendChild(li);
+        });
+        if (!d.archive.length) ul.innerHTML = '<li>Još nema arhiviranih verzija.</li>';
+      })
+      .catch(function () {
+        document.getElementById('cjenik-updated').textContent = 'nije dostupno – pokušajte kasnije';
+        document.getElementById('cjenik-arhiva').innerHTML =
+          '<li><a href="' + base + '/">Otvori arhivu</a></li>';
+      });
+  })();
+</script>
