@@ -66,10 +66,13 @@ Dodaj zapis: **CNAME** `cjenik` → `KORISNIK.github.io`
 
 Shopify i glavna domena shopa ostaju netaknuti.
 
-## 7. Footer u Shopifyju
+## 7. Stranica na Shopifyju + footer
 
-*Online Store → Navigation → Footer menu → Add menu item*:
-naziv **Cjenik proizvoda**, link `https://cjenik.tvojshop.hr/`
+1. *Online Store → Pages → Add page*: naslov **Cjenik proizvoda**, sadržaj prazan → *Save* (adresa: `/pages/cjenik-proizvoda`).
+2. *Online Store → Themes → Customize* → gore u izborniku *Pages → Create template* → naziv `cjenik`.
+3. U tom predlošku *Add section → Custom Liquid* → zalijepi sadržaj `shopify/cjenik-sekcija.liquid` → *Save*.
+4. Vrati se na stranicu iz koraka 1 → desno *Theme template* → **cjenik** → *Save*.
+5. *Online Store → Navigation → Footer menu → Add menu item*: **Cjenik proizvoda** → odaberi stranicu iz koraka 1.
 
 ---
 
