@@ -191,7 +191,7 @@ function toRow(v, history, today) {
   const title = v.title && v.title !== 'Default Title' ? `${v.product.title} - ${v.title}` : v.product.title;
   return {
     title,
-    sku: v.sku || '',
+    sku: v.sku || v.id.split('/').pop(), // bez SKU-a: stalni Shopify ID varijante
     vendor: v.product.vendor || '',
     netQty: upm?.quantityValue ? `${fmtNum(upm.quantityValue)} ${UNIT_LABELS[upm.quantityUnit] || upm.quantityUnit.toLowerCase()}` : '',
     unit: upm?.referenceUnit ? `${upm.referenceValue > 1 ? upm.referenceValue + ' ' : ''}${UNIT_LABELS[upm.referenceUnit] || upm.referenceUnit.toLowerCase()}` : cfg.defaultUnit,
