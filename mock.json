@@ -1,0 +1,22 @@
+[
+  {
+    "id": "gid://shopify/ProductVariant/1", "sku": "POST123", "barcode": "3851234567890",
+    "price": "39.99", "compareAtPrice": "49.99", "availableForSale": true, "title": "Default Title",
+    "unitPriceMeasurement": null,
+    "anchor": { "value": "{\"amount\":\"44.99\",\"currency_code\":\"EUR\"}" },
+    "product": { "id": "gid://shopify/Product/1", "title": "Posteljina 200x220", "vendor": "Dom na klik", "productType": "Posteljina", "status": "ACTIVE", "onlineStoreUrl": "https://x", "category": null, "anchor": null }
+  },
+  {
+    "id": "gid://shopify/ProductVariant/2", "sku": "SAP500", "barcode": "3850000000011",
+    "price": "3.49", "compareAtPrice": null, "availableForSale": false, "title": "500 ml",
+    "unitPriceMeasurement": { "quantityValue": 500, "quantityUnit": "ML", "referenceValue": 1, "referenceUnit": "L" },
+    "anchor": null,
+    "product": { "id": "gid://shopify/Product/2", "title": "Sapun; tekući \"Lavanda\"", "vendor": "Eko", "productType": "", "status": "ACTIVE", "onlineStoreUrl": "https://x", "category": { "name": "Sapuni" }, "anchor": { "value": "3.29" } }
+  },
+  {
+    "id": "gid://shopify/ProductVariant/3", "sku": "DRAFT1", "barcode": "",
+    "price": "1.00", "compareAtPrice": null, "availableForSale": true, "title": "Default Title",
+    "unitPriceMeasurement": null, "anchor": null,
+    "product": { "id": "gid://shopify/Product/3", "title": "Skica", "vendor": "", "productType": "", "status": "DRAFT", "onlineStoreUrl": null, "category": null, "anchor": null }
+  }
+]

@@ -1,0 +1,59 @@
+name: Cjenik
+
+on:
+  schedule:
+    - cron: '5 * * * *'   # svaki sat (UTC); GitHub zna kasniti nekoliko minuta
+  workflow_dispatch:       # ručno pokretanje: Actions → Cjenik → Run workflow
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cjenik
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Prethodno objavljeni cjenik, arhiva i povijest cijena žive na grani gh-pages
+      - name: Dohvati postojeću arhivu
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
+            git clone --depth 1 --branch gh-pages "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" public
+            rm -rf public/.git
+          else
+            mkdir -p public
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generiraj cjenik
+        env:
+          SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
+          SHOPIFY_CLIENT_ID: ${{ secrets.SHOPIFY_CLIENT_ID }}
+          SHOPIFY_CLIENT_SECRET: ${{ secrets.SHOPIFY_CLIENT_SECRET }}
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          ANCHOR_METAFIELD: variant:custom.sidrena_cijena
+          SHOP_NAME: ${{ vars.SHOP_NAME }}
+          PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+          OUTPUT_DIR: public
+        run: node generate.mjs
+
+      # Grana gh-pages uvijek ima samo jedan commit, pa repozitorij ne raste iz sata u sat
+      - name: Objavi
+        env:
+          PAGES_DOMAIN: ${{ vars.PAGES_DOMAIN }}
+        run: |
+          cd public
+          if [ -n "$PAGES_DOMAIN" ]; then echo "$PAGES_DOMAIN" > CNAME; fi
+          git init -q -b gh-pages
+          git config user.name "cjenik-bot"
+          git config user.email "cjenik-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Cjenik $(TZ=Europe/Zagreb date '+%d.%m.%Y. %H:%M')"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
